@@ -1,6 +1,6 @@
 # agent-skills
 
-Agent 可用的 skill 集合，一个目录一个 skill。
+本人自建的 Agent 可用 skill 集合，一个目录一个 skill。
 
 | skill | 用途 |
 |---|---|
