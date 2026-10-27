@@ -36,7 +36,7 @@
 | 位置 | 典型大小 | 性质 | 判读 |
 |---|---|---|---|
 | `SteamLibrary\steamapps\common\<游戏>` | 0.05–10 GB | 游戏本体 | 0.00 GB 的是卸载残留空壳，不算账 |
-| `SteamLibrary\steamapps\workshop\content\<appid>` | 5–25 GB | 创意工坊（431960 = Wallpaper Engine、1477070 = Depersonalization、646570 = Slay the Spire） | 按 appid 报对应游戏名，否则他不知道退订谁 |
+| `SteamLibrary\steamapps\workshop\content\<appid>` | 5–25 GB | 创意工坊（431960 = Wallpaper Engine、1477070 = Depersonalization、646570 = Slay the Spire） | 按 appid 报对应游戏名，否则用户不知道退订谁 |
 | `360MoveData\Users\<user>\Documents` | 10–20 GB | 360 搬家产物：`WeChat Files`、`Tencent Files`、录屏 | 第 4 档，不动 |
 | 云盘下载 / 下载目录 | 10–15 GB | 分卷包（`.z01`）与解压目录并存、旧安装包 | 分卷+解压通常是两份 |
 | 资料目录 + 同名 `.zip` | 15–30 GB | 备份包与解压版 | 先做叶子名覆盖比对 |
@@ -56,6 +56,6 @@
 
 ## 纪律
 
-- 只读阶段一个文件都不动；他对「查一下」的理解是不动文件。
+- 只读阶段一个文件都不动；用户对「查一下」的理解是不动文件。
 - 提权（`vssadmin`、`DISM`、`pnputil`）之前单独问一次，不自己弹 UAC。
 - 删除只对点名项执行；同一块盘上的同类目录不在授权内。

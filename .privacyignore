@@ -1,0 +1,10 @@
+# 本仓库自己的文档与规则表会命中扫描器自己的关键词（拍板、state.db、C:\Windows 等），属预期。
+# 被忽略的只有讲解这些模式的 md 与两个规则脚本；功能代码、测试夹具仍全量扫描。
+README.md
+.privacyignore
+github-publish/SKILL.md
+github-publish/references/readme-template.md
+github-publish/scripts/privacy_scan.py
+github-publish/scripts/doc_lint.py
+disk-cleanup/SKILL.md
+disk-cleanup/references/disk-space-forensics.md
