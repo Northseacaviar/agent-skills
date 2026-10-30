@@ -1,7 +1,7 @@
 ---
 name: dsh-wechat-bridge
-description: "Use when 把 DSH（DeepSeek Harness）接到微信做远程控制，或修 iLink/ClawBot 桥接。agent 主导配置，人只负责 key、扫码、点授权。"
-version: 1.0.0
+description: "Use when 把 DSH（DeepSeek Harness）接到微信做远程控制，或修 iLink/ClawBot 桥接。agent 全流程主导，人只需扫码和点授权；复用已有 key，不要向人要 API key。"
+version: 1.1.0
 author: Northseacaviar
 license: MIT
 metadata:
@@ -13,7 +13,9 @@ metadata:
 
 你在 Windows 上配置一个常驻程序：微信 ClawBot 收到消息 → 本机 DSH 执行 → 结果发回微信。
 
-**由你完成全部工作。** 人只在三个时刻介入：提供 API key、扫码、点权限弹窗。
+**由你完成全部工作。** 人只在两个时刻介入：扫码、点权限弹窗。
+
+**不要向人要 API key。** DSH 图形界面里配过的 key 可以直接复用，先按步骤 5 打开凭据插件；只有那台机器从未配过任何 key 时，才引导人去 `dsh web` 的 Models 页面填一次。直接把「要一个 key」当成前置条件去问人，是错的。
 
 ## 何时用
 
@@ -117,13 +119,14 @@ python bridge.py
 
 **9. 自检**（见下节）
 
-## 必须停下来找人的三个时刻
+## 必须停下来找人的两个时刻
 
 | 时刻 | 你要说的话 | 为什么不能自己解决 |
 |---|---|---|
-| 缺 API key | 「需要一个 DeepSeek API key」 | 无法猜测或生成 |
 | 二维码出现 | 「请用微信扫码」 | 只有人的手机能扫 |
 | 权限弹窗 | 「需要点同意，我在等」 | 沙箱授权必须人批 |
+
+**API key 不在这张表里。** 那是步骤 5 自己改一行 patch 就能解决的事，不是要人出手的事。
 
 遇到这行报错：
 
@@ -166,6 +169,31 @@ tasklist /FI "IMAGENAME eq python.exe"
 **七、iLink 只能私聊**，群消息基本收不到事件。
 
 **八、`~/.dsh/.credentials.yaml` 里有 key 不等于 headless 能用。** headless profile 把 credentials 插件设成 `disabled: true`，图形界面配的凭据它读不到。不要去复制 key 到环境变量，改一行 patch 就行。
+
+## 响应速度（实测，0.2.1-rc.5）
+
+每条微信消息从发出到收到回复是 **4–9 秒**，其中模型只占 1 秒，其余全是框架启动。先把这件事告诉人，免得人以为是卡住了。
+
+| 环节 | 实测 |
+|---|---|
+| 裸调 DeepSeek 接口（同一句话） | 0.96 s |
+| `node <入口> --version`（不加载插件） | 0.2–0.4 s |
+| `node <入口> headless --dump-config`（只读配置） | 0.2 s |
+| `node <入口> headless --help`（触发插件加载） | 5.7–6.4 s |
+| 极简任务完整跑完（缓存已热） | 4.6 s |
+| 极简任务完整跑完（冷启动） | 8.5–9.4 s |
+
+**根因是插件数量，不是模型。** 用 `headless --dump-config` 数一下，profile 里有 **98 个插件条目**（sandbox、approval、permission、session-persistence、otel、subagent、workflow、web、mcp、compaction……全部常驻加载）。`--help` 都要 6 秒，因为它同样要把这 98 个插件初始化一遍。再加上 headless 是「跑一个任务就退出的进程」，下一句话又要从头加载一次。
+
+**这不是可修的 bug，是 headless 的架构选择。** Hermes 与 Claude Code 是常驻进程，启动一次用一整天；DSH 桌面版也常驻。慢只发生在 headless 这种一次性调用上。
+
+**三条对策**，按性价比排：
+
+1. **接受它**。4–5 秒回一条消息，在聊天场景里可用。先把预期讲清楚，别让人以为死机。
+2. **常驻复用**：自己起一个长活的 node 进程加载一次 DSH，通过 stdin/IPC 反复投任务。理论上去掉那 3.6 秒，但**未实测**，且要处理进程崩溃、任务隔离、并发；不值得为省 4 秒引入这么多状态。
+3. **换通道**：真要秒回就用 Telegram / 飞书接 Hermes 那套，DSH 留着干重活。
+
+不要为了提速去禁用插件：`sandbox`、`approval`、`permission` 一旦关掉，桥接程序等于给微信另一端开了本机全权限，微信账号被盗就是本机沦陷。
 
 ## 边界
 
