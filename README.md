@@ -6,6 +6,7 @@
 |---|---|
 | [disk-cleanup](disk-cleanup/) | 磁盘满了：问清哪块盘 → 只读扫描出账 → 分档方案 → 点名后按清单清理 |
 | [github-publish](github-publish/) | 项目发布：隐私闸门 → README 去 AI 味 → 版本号 → 推送与远端核验 |
+| [dsh-wechat-bridge](dsh-wechat-bridge/) | 把 DSH 接到微信：扫码绑定 → headless 调用 → 崩溃守护、权限要人批的时机 |
 
 ## 安装
 
