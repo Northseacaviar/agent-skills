@@ -29,7 +29,7 @@ metadata:
 
 - DSH 全局安装：`%APPDATA%\npm\node_modules\@deepseek-ai\dsh`，入口 `lib\bin.js`
 - 调用方式：`node <入口> headless -` —— 任务从 **stdin** 读；答案在 stdout，模型思考过程在 stderr
-- 必需环境变量：`DEEPSEEK_API_KEY`
+- 凭据：headless profile **默认禁用 credentials 插件**，需在 profile patch 里打开（见步骤 5）；打开后直接复用图形界面已配好的 key，**不需要再设环境变量**
 - 微信侧 SDK：`https://github.com/openilink/openilink-sdk-python`（**PyPI 上没有这个包**）
 - 安装命令：`python -m pip install -e ".[qrcode]"` —— qrcode 是可选依赖，不显式装会在导入 `print_qrcode` 时 ImportError
 - Python 必须 ≥3.10，Node ≥18
@@ -41,7 +41,6 @@ metadata:
 |---|---|
 | `D:\dsh-bridge\bridge.py` | 主程序，全文见最后一节 |
 | `D:\dsh-bridge\start.bat` | 循环守护，全文见最后一节 |
-| `D:\dsh-bridge\deepseek.key` | 单行 API key |
 | Startup 快捷方式 | 指向 start.bat |
 
 ## 执行步骤
@@ -75,7 +74,31 @@ python -c "import openilink, qrcode; print('ok')"
 
 **4. 写 `start.bat`**（全文见最后一节）
 
-**5. 写 `deepseek.key`**：向人索取 API key，写入单行，无引号无空格无换行
+**5. 启用凭据插件**（不然后面一定报 MISSING_CREDENTIAL）
+
+DSH 的 headless profile **默认把凭据插件关了**（`disabled: true`），所以哪怕图形界面里已经配过 key，headless 也读不到。改 `~/.dsh/profiles/headless/cordis.patch.yml`：
+
+```yaml
+- id: credentials
+  disabled: false
+```
+
+验证配置生效：
+
+```cmd
+node %APPDATA%\npm\node_modules\@deepseek-ai\dsh\lib\bin.js headless --dump-config
+```
+
+输出里 `- id: credentials` 那段的 `disabled` 必须是 `false`。
+
+再**不带任何环境变量**跑一次：
+
+```cmd
+node %APPDATA%\npm\node_modules\@deepseek-ai\dsh\lib\bin.js headless "只回答两个字：收到"
+```
+
+- **能输出** → 凭据复用成功，跳过下面的兜底
+- **仍报 `MISSING_CREDENTIAL`** → 这台机器从没配过 key。在 `dsh web` 的 Models 页面填一次（之后所有 profile 共享）；临时应急才用 `set DEEPSEEK_API_KEY=sk-xxx`
 
 **6. 配自启**：把 `start.bat` 的快捷方式放进 `shell:startup`
 
@@ -141,6 +164,8 @@ tasklist /FI "IMAGENAME eq python.exe"
 **六、stderr 里是模型的思考过程**（如 `Hmm, keep it concise...`），不是错误。只在 stdout 为空时才回退取 stderr。
 
 **七、iLink 只能私聊**，群消息基本收不到事件。
+
+**八、`~/.dsh/.credentials.yaml` 里有 key 不等于 headless 能用。** headless profile 把 credentials 插件设成 `disabled: true`，图形界面配的凭据它读不到。不要去复制 key 到环境变量，改一行 patch 就行。
 
 ## 边界
 
@@ -281,7 +306,6 @@ client.monitor(handler, opts=MonitorOptions(
 ```bat
 @echo off
 cd /d D:\dsh-bridge
-for /f "usebackq delims=" %%a in ("D:\dsh-bridge\deepseek.key") do set DEEPSEEK_API_KEY=%%a
 
 :loop
 python "D:\dsh-bridge\bridge.py" >> "D:\dsh-bridge\console.log" 2>&1
