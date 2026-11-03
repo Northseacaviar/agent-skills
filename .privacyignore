@@ -8,3 +8,32 @@ github-publish/scripts/privacy_scan.py
 github-publish/scripts/doc_lint.py
 disk-cleanup/SKILL.md
 disk-cleanup/references/disk-space-forensics.md
+
+# paper/ 下转载的第三方内容：会议官方 LaTeX 模板自带原作者邮箱，Clawic 的 skill 自带推广链接。
+paper/conference-paper-writing/templates/
+paper/chinese/
+
+# 以下 md 里的 ".claude/" 是安装路径说明，属预期，不是工具痕迹泄露。
+paper/citation-verifier/SKILL.md
+paper/draft-marker-discipline/SKILL.md
+paper/paper-bootstrap/SKILL.md
+paper/paper-reviewer/SKILL.md
+paper/scientific-prose-style/references/ai-tells.md
+paper/scientific-writing/SKILL.md
+paper/submission-audit/SKILL.md
+
+# process_narration 规则把 markdown 加粗 "**" 当成过程叙述，属误报。
+paper/empirical-manuscript-diagnosis/SKILL.md
+paper/paper-analyzer/SKILL.md
+
+# 占位邮箱（xxx@...）与 markdown 加粗误报。
+dsh-wechat-bridge/SKILL.md
+
+# 期刊官方投稿邮箱（djgl@...），公开信息，不是个人信息。
+paper/journal-selection-for-submission/references/cn-econ-journal-hard-data.md
+
+# secret_assign 命中的是变量名本身：api_key 形参、PDF 解析里的 token 局部变量。
+# 逐处人工核过，无凭据值；这三个文件不会写入任何 key。
+paper/conference-paper-writing/references/citation-workflow.md
+paper/nature-figure/scripts/audit_pdf_text.py
+paper/nature-figure/scripts/validate_figure.py
