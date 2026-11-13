@@ -16,6 +16,12 @@
 |---|---|
 | [today-news](today-news/) | 当日热点与市场简报：时间锚定 → 并行检索 → 三档信源核验 → 事实/推断/反向分写 → 落盘（聊天版 800—1000 字） |
 
+## 文档与交付
+
+| skill | 用途 |
+|---|---|
+| [paper-translation](paper-translation/) | 英文论文/研报翻成中文：算体量定范围 → 按节译 → DOCX/PDF 排版 → 图表保留；附带券商研报去水印脚本 |
+
 ## 论文：已拆为独立仓库
 
 41 个论文 skill 移到了 [Northseacaviar/paper-workflow](https://github.com/Northseacaviar/paper-workflow)——流程骨架 7、写作与语言 9、审查与核验 15、图表与交付 10，附 14 个外部 skill 库的地址与取舍判断。
@@ -29,7 +35,7 @@
 - Hermes：`~/.hermes/skills/<skill>/`（或你配置的 skills 目录）
 - Claude Code：`<project>/.claude/skills/<skill>/`
 
-脚本只依赖 Python 3 标准库，无第三方包。
+脚本只依赖 Python 3 标准库，唯一例外是 `paper-translation`：它需要 `pymupdf`、`pikepdf`、`python-docx`、`pywin32`，导出 PDF 还要本机装 Word。
 
 ## 许可
 
